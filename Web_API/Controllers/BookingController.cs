@@ -1,33 +1,41 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
+using System;
+using System.Collections.Generic;
 using System.Data;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using Web_API.Models;
-
 namespace Web_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class HotelController : ControllerBase
+    public class BookingController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        public HotelController(IConfiguration configuration)
+        private readonly IWebHostEnvironment _env;
+        public BookingController(IConfiguration configuration, IWebHostEnvironment env)
         {
             _configuration = configuration;
+            _env = env;
         }
 
         [HttpGet]
         public JsonResult Get()
         {
             string query = @"
-                        select HotelId,HotelName from 
-                        Hotel
-            ";
+                        select BookingId,HotelId,BedroomId,
+                        Statut, prixParNuits, nbreNuits, ClientId
+                        from 
+                        Booking
+            "; 
 
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("BookingConnection");
@@ -50,11 +58,13 @@ namespace Web_API.Controllers
 
 
         [HttpPost]
-        public JsonResult Post(Hotel otel)
+        public JsonResult Post(Booking booking)
         {
             string query = @"
-                        insert into Hotel (HotelName) values
-                                                    (@HotelName);
+                        insert into Booking 
+                        (Statut,prixParNuits,nbreNuits,ClientId) 
+                        values
+                         (@Statut,@prixParNuits,@nbreNuits,@ClientId) ;
                         
             ";
 
@@ -66,7 +76,10 @@ namespace Web_API.Controllers
                 mycon.Open();
                 using (MySqlCommand myCommand = new MySqlCommand(query, mycon))
                 {
-                    myCommand.Parameters.AddWithValue("@HotelName", otel.HotelName);
+                    myCommand.Parameters.AddWithValue("@Statut", booking.Statut);
+                    myCommand.Parameters.AddWithValue("@prixParNuits", booking.prixParNuits);
+                    myCommand.Parameters.AddWithValue("@nbreNuits", booking.nbreNuits);
+                    myCommand.Parameters.AddWithValue("@ClientId", booking.ClientId);
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -81,12 +94,15 @@ namespace Web_API.Controllers
 
 
         [HttpPut]
-        public JsonResult Put(Hotel otel)
+        public JsonResult Put(Booking booking)
         {
             string query = @"
-                        update Hotel set 
-                        HotelName =@HotelName
-                        where HotelId=@HotelId;
+                        update Booking set 
+                        Statut =@Statut,
+                        prixParNuits =@prixParNuits,
+                        nbreNuits =@nbreNuits,
+                        ClientId =@ClientId
+                        where BookingId=@BookingId && HotelId=@HotelId && BedroomId=@BedroomId;
                         
             ";
 
@@ -98,8 +114,13 @@ namespace Web_API.Controllers
                 mycon.Open();
                 using (MySqlCommand myCommand = new MySqlCommand(query, mycon))
                 {
-                    myCommand.Parameters.AddWithValue("@HotelId", otel.HotelId);
-                    myCommand.Parameters.AddWithValue("@HotelName", otel.HotelName);
+                    myCommand.Parameters.AddWithValue("@BookingId", booking.BookingId);
+                    myCommand.Parameters.AddWithValue("@HotelId", booking.HotelId);
+                    myCommand.Parameters.AddWithValue("@BedroomId", booking.BedroomId);
+                    myCommand.Parameters.AddWithValue("@Statut", booking.Statut);
+                    myCommand.Parameters.AddWithValue("@prixParNuits", booking.prixParNuits);
+                    myCommand.Parameters.AddWithValue("@nbreNuits", booking.nbreNuits);
+                    myCommand.Parameters.AddWithValue("@ClientId", booking.ClientId);
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -118,8 +139,8 @@ namespace Web_API.Controllers
         public JsonResult Delete(int id)
         {
             string query = @"
-                        delete from Hotel 
-                        where HotelId=@HotelId;
+                        delete from Booking 
+                       where BookingId=@BookingId && HotelId=@HotelId && BedroomId=@BedroomId;
                         
             ";
 
@@ -131,7 +152,7 @@ namespace Web_API.Controllers
                 mycon.Open();
                 using (MySqlCommand myCommand = new MySqlCommand(query, mycon))
                 {
-                    myCommand.Parameters.AddWithValue("@HotelId", id);
+                    myCommand.Parameters.AddWithValue("@BookingId, @HotelId, @BedroomId", id);
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -144,5 +165,31 @@ namespace Web_API.Controllers
             return new JsonResult("Deleted Successfully");
         }
 
+
+        [Route("SaveFile")]
+        [HttpPost]
+        public JsonResult SaveFile()
+        {
+            try
+            {
+
+                var httpReuest = Request.Form;
+                var postedFile = httpReuest.Files[0];
+                string filename = postedFile.FileName;
+                var physicalPath = _env.ContentRootPath + "/Photos/" + filename;
+
+                using (var stream = new FileStream(physicalPath, FileMode.Create))
+                {
+                    postedFile.CopyTo(stream);
+                }
+
+                return new JsonResult(filename);
+            }
+            catch (Exception)
+            {
+
+                return new JsonResult("IN.png");
+            }
+        }
     }
 }

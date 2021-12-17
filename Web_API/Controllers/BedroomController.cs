@@ -13,10 +13,10 @@ namespace Web_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class HotelController : ControllerBase
+    public class BedroomController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        public HotelController(IConfiguration configuration)
+        public BedroomController(IConfiguration configuration)
         {
             _configuration = configuration;
         }
@@ -25,8 +25,9 @@ namespace Web_API.Controllers
         public JsonResult Get()
         {
             string query = @"
-                        select HotelId,HotelName from 
-                        Hotel
+                        select BedroomId,NumChambre, HotelId from 
+                        Bedroom
+                        
             ";
 
             DataTable table = new DataTable();
@@ -50,11 +51,12 @@ namespace Web_API.Controllers
 
 
         [HttpPost]
-        public JsonResult Post(Hotel otel)
+        public JsonResult Post(Bedroom bedroom)
         {
             string query = @"
-                        insert into Hotel (HotelName) values
-                                                    (@HotelName);
+                        insert into Bedroom (NumChambre) values (@NumChambre);
+                        insert into Bedroom (HotelId) values (@HotelId);
+                       
                         
             ";
 
@@ -66,7 +68,9 @@ namespace Web_API.Controllers
                 mycon.Open();
                 using (MySqlCommand myCommand = new MySqlCommand(query, mycon))
                 {
-                    myCommand.Parameters.AddWithValue("@HotelName", otel.HotelName);
+                    myCommand.Parameters.AddWithValue("@NumChambre", bedroom.NumChambre);
+                    myCommand.Parameters.AddWithValue("@HotelId", bedroom.HotelId);
+               
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -81,12 +85,13 @@ namespace Web_API.Controllers
 
 
         [HttpPut]
-        public JsonResult Put(Hotel otel)
+        public JsonResult Put(Bedroom bedroom)
         {
             string query = @"
-                        update Hotel set 
-                        HotelName =@HotelName
-                        where HotelId=@HotelId;
+                        update Bedroom set 
+                        NumChambre =@NumChambre
+                        HotelId =@HotelId
+                        where BedroomId=@BedroomId;
                         
             ";
 
@@ -98,8 +103,9 @@ namespace Web_API.Controllers
                 mycon.Open();
                 using (MySqlCommand myCommand = new MySqlCommand(query, mycon))
                 {
-                    myCommand.Parameters.AddWithValue("@HotelId", otel.HotelId);
-                    myCommand.Parameters.AddWithValue("@HotelName", otel.HotelName);
+                    myCommand.Parameters.AddWithValue("@BedroomId", bedroom.BedroomId);
+                    myCommand.Parameters.AddWithValue("@NumChambre", bedroom.NumChambre);
+                    myCommand.Parameters.AddWithValue("@HotelId", bedroom.HotelId);
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -118,8 +124,8 @@ namespace Web_API.Controllers
         public JsonResult Delete(int id)
         {
             string query = @"
-                        delete from Hotel 
-                        where HotelId=@HotelId;
+                        delete from Bedroom 
+                        where BedroomId=@BedroomId;
                         
             ";
 
@@ -131,7 +137,7 @@ namespace Web_API.Controllers
                 mycon.Open();
                 using (MySqlCommand myCommand = new MySqlCommand(query, mycon))
                 {
-                    myCommand.Parameters.AddWithValue("@HotelId", id);
+                    myCommand.Parameters.AddWithValue("@BedroomId", id);
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -143,6 +149,5 @@ namespace Web_API.Controllers
 
             return new JsonResult("Deleted Successfully");
         }
-
     }
 }

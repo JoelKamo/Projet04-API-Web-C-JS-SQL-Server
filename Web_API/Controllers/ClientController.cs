@@ -27,7 +27,7 @@ namespace Web_API.Controllers
             string query = @"
                         select ClientId,Name, Gender, Email from 
                         Client
-                        //db2192643.Client
+                        
             ";
 
             DataTable table = new DataTable();
