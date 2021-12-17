@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Serialization;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
+using Web_API.data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Web_API
 {
@@ -41,6 +43,11 @@ namespace Web_API
                 = new DefaultContractResolver());
 
             services.AddControllers();
+            services.AddDbContext<BookingContext>(options =>
+           {
+               options.UseMySQL(Configuration.GetConnectionString("BookingConnection"));
+           });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
