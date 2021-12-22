@@ -7,7 +7,7 @@ namespace Web_API.Models
 {
     public class Hotel
     {
-        //Creation des classes associe au table 
+        //Creation des classes associe au table
         private string hotelname;
         private int hotelid;
 
