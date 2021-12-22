@@ -15,6 +15,9 @@ namespace Web_API.Controllers
     [ApiController]
     public class ClientController : ControllerBase
     {
+
+        // Creation controleur Booking
+
         private readonly IConfiguration _configuration;
         public ClientController(IConfiguration configuration)
         {
@@ -23,7 +26,10 @@ namespace Web_API.Controllers
 
         [HttpGet]
         public JsonResult Get()
+
         {
+            
+            // Liste tous les champs de la table 
             string query = @"
                         select ClientId,Name, Gender, Email from 
                         Client

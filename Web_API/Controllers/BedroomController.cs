@@ -15,6 +15,8 @@ namespace Web_API.Controllers
     [ApiController]
     public class BedroomController : ControllerBase
     {
+        // Creation controleur Booking
+       
         private readonly IConfiguration _configuration;
         public BedroomController(IConfiguration configuration)
         {
@@ -24,6 +26,7 @@ namespace Web_API.Controllers
         [HttpGet]
         public JsonResult Get()
         {
+            // Liste tous les champs de la table 
             string query = @"
                         select BedroomId,NumChambre, HotelId from 
                         Bedroom

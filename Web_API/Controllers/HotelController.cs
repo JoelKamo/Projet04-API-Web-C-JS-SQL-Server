@@ -24,6 +24,7 @@ namespace Web_API.Controllers
         [HttpGet]
         public JsonResult Get()
         {
+            // Liste tous les champs de la table 
             string query = @"
                         select HotelId,HotelName from 
                         Hotel

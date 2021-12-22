@@ -60,6 +60,7 @@ namespace Web_API.Controllers
         [HttpPost]
         public JsonResult Post(Booking booking)
         {
+            // Liste tous les champs de la table 
             string query = @"
                         insert into Booking 
                         (Statut,prixParNuits,nbreNuits,ClientId) 

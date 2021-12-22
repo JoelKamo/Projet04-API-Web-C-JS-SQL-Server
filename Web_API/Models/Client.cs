@@ -7,7 +7,7 @@ namespace Web_API.Models
 {
     public class Client
     {
-
+        //Creation des classes associe au table 
         private string name;
         private int clientid;
         private Char gender;

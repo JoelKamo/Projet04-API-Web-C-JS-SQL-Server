@@ -8,6 +8,7 @@ namespace Web_API.Models
     public class Bedroom
     {
 
+        //Creation des classes associe au table 
         
         private int numchambre;
         private int bedroomid;

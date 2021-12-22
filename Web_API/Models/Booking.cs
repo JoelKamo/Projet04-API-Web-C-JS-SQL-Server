@@ -7,7 +7,7 @@ namespace Web_API.Models
 {
     public class Booking
     {
-
+        //Creation des classes associe au table 
         private int bookingid;
         private int hotelid;
         private int bedroomid;
